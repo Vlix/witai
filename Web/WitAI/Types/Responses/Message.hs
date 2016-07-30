@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleInstances #-}
+
 module Web.WitAI.Types.Responses.Message where
 
 import           Data.Text
@@ -19,7 +21,7 @@ data WitAIMessageResponse = WitAIMessageResponse
     , witres_message__text    :: Text
   -- Either the text sent in the 'q' argument or the transcript of the speech input.
   -- This value should be used only for debug as Wit.AI focuses on the intent.
-    , witres_message_entities :: Map Text [WitAIEntity]
+    , witres_message_entities :: Maybe (Map Text [WitAIEntity])
   -- Object of entities. Each entity will contain an array []
   -- of values even if there is only one value.
     } deriving (Eq, Show)

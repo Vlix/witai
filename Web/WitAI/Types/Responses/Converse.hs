@@ -1,16 +1,21 @@
+{-# LANGUAGE FlexibleInstances #-}
+
 module Web.WitAI.Types.Responses.Converse where
 
 import           Data.Text
+
 import           Data.Aeson
 import           Data.Aeson.Types     (typeMismatch)
+import           Data.Map.Strict
 
+import           Web.WitAI.Types.Static
 
 -- ===================== --
 --   CONVERSE RESPONSE   --
 -- ===================== --
 
 data WitAIConverseResponse = WitAIConverseResponse
-    { witres_converse_type       :: ConverseResponseType
+    { witres_converse_type       :: WitAIConverseType
     , witres_converse_entities   :: Maybe (Map Text [WitAIConverseEntity])
     , witres_converse_msg        :: Maybe Text
     , witres_converse_action     :: Maybe Text

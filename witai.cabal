@@ -2,7 +2,7 @@
 --  see http://haskell.org/cabal/users-guide/
 
 name:                witai
-version:             0.1.0.0
+version:             0.1.0.1
 synopsis:            Web interface with Wit.ai API
 -- description:         
 license:             MIT
@@ -18,10 +18,15 @@ cabal-version:       >=1.10
 library
   exposed-modules:     Web.WitAI
                        Web.WitAI.Types
+                       Web.WitAI.Types.Requests
                        Web.WitAI.Types.Requests.Message
                        Web.WitAI.Types.Requests.Speech
+                       Web.WitAI.Types.Requests.Entities
                        Web.WitAI.Types.Responses
                        Web.WitAI.Types.Responses.Message
+                       Web.WitAI.Types.Responses.Converse
+                       Web.WitAI.Types.Responses.Entities
+                       Web.WitAI.Types.Static
 
   -- other-modules:       
   -- other-extensions:    
@@ -30,9 +35,12 @@ library
                      , unordered-containers         >= 0.2.5.0
                      , text                         >= 0.11       && < 2.0
                      , http-client
+                     , http-types
                      , http-client-tls
                      , containers
-                     
+                     , exceptions
+                     , transformers
+                     , bytestring
 
   -- hs-source-dirs:      
   default-language:    Haskell2010

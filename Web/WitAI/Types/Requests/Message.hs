@@ -2,7 +2,7 @@ module Web.WitAI.Types.Requests.Message where
 
 import Data.Text
 
-import Data.Aeson           ((.:?))
+import Data.Aeson
 import Data.Aeson.Types     (typeMismatch)
 
 

@@ -4,16 +4,21 @@ module Web.WitAI where
 
 import           Web.WitAI.Types
 
---import           Data.ByteString.Lazy
+import           Data.ByteString            (ByteString(..))
+import           Data.Monoid                ((<>))
 import           Data.Text
-import           Data.Text.Lazy.Encoding    (encodeUtf8)
+import           Data.Text.Encoding         (encodeUtf8)
+import           Control.Monad.IO.Class
+import           Control.Monad.Catch
+
 import           Data.Aeson
 import           Data.Map.Strict
+import           Network.HTTP.Client
+import           Network.HTTP.Types         (hAccept,hAuthorization,hContentType)
 import           Network.HTTP.Client.TLS    (tlsManagerSettings)
-import           Network.HTTP.Client        (parseRequest, Request(..))
 
-witAI :: (MonadIO m, MonadThrow m) => WitAIConverseHandlers -> WitAIConverseSettings -> Text -> m ()
-witAI handlers settings msg = recWitAIRequest True empty
+witAI :: (MonadIO m, MonadThrow m) => WitAIConverseHandlers m -> WitAIConverseSettings -> Text -> m ()
+witAI handlers settings msg = recWitAIRequest True $ witAI_context settings
   where
     recWitAIRequest isFirst contextmap = do
         req' <- parseRequest "https://api.wit.ai/converse"
@@ -25,17 +30,18 @@ witAI handlers settings msg = recWitAIRequest True empty
                             , requestBody = RequestBodyLBS $ encode contextmap
                             }
             isFirst' = if isFirst
-                            then [("q", Just . encodeUtf8 $ witAI_textfunc msg)]
+                            then [("q", Just . encodeUtf8 $ witAI_textfunc settings msg)]
                             else []
             version   = witAI_version settings
             sessionid = witAI_session_id settings
             querystring = [ ("v", Just $ encodeUtf8 version)
                           , ("session_id", Just $ encodeUtf8 sessionid)
-                          ] ++ isFirst' isFirst
+                          ] ++ isFirst'
             request = setQueryString querystring request'
-        res <- liftIO $ httpLbs tlsManagerSettings request
+        manager <- liftIO $ newManager tlsManagerSettings
+        res <- liftIO $ httpLbs request manager
         -- The message is sent to Wit.AI
-        let responseBS = responseBody res :: ByteString
+        let responseBS = responseBody res
         -- This is what Wit.AI found and below is how to formulate a response
         case (eitherDecode' responseBS :: Either String WitAIConverseResponse) of
             -- this is the ParseConverseResponse being sent to the new handler?...
